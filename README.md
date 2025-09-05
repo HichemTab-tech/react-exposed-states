@@ -29,7 +29,7 @@ pnpm add react-exposed-states
 
 ```tsx
 import { useState } from 'react';
-import expose from 'react-exposed-states';
+import {expose} from 'react-exposed-states';
 
 export default function Counter() {
   // By default, no key is needed; a unique component id will be used
@@ -52,7 +52,7 @@ This means each exposed state is uniquely identified by its component instance u
 
 ```tsx
 import { useState } from 'react';
-import expose from 'react-exposed-states';
+import {expose} from 'react-exposed-states';
 
 function Example() {
 
