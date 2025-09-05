@@ -10,6 +10,8 @@ A tiny utility that mirrors a component’s state to `window.exposed` with a sta
 so you can inspect, modify, and subscribe to changes from the browser console.
 Designed for **dev-only** workflows.
 
+By default, the key used to expose the state is automatically generated per component instance (using React's `useId()`), so you don't need to specify it unless you want a custom readable key.
+
 ## 🚀 Install
 
 ```sh
@@ -29,7 +31,10 @@ import { useState } from 'react';
 import expose from 'react-exposed-states';
 
 export default function Counter() {
-  const [count, setCount] = expose(useState(0), 'myCounter'); // key is 'myCounter'
+  // By default, no key is needed; a unique component id will be used
+  const [count, setCount] = expose(useState(0));
+  // If you want to identify the state by a custom readable key, provide it as the second argument:
+  // const [count, setCount] = expose(useState(0), 'myCounter');
   return <button onClick={() => setCount(c => c + 1)}>Count: {count}</button>;
 }
 
@@ -40,6 +45,7 @@ export default function Counter() {
 ```
 
 If you omit the second argument, the hook uses React’s `useId()` to generate a stable key per mount.
+This means each exposed state is uniquely identified by its component instance unless you provide a custom key.
 
 ## 📖 Usage
 
@@ -48,10 +54,11 @@ import { useState } from 'react';
 import expose from 'react-exposed-states';
 
 function Example() {
-  // Auto key via useId()
+
+  // Default: auto key via component id
   const [value, setValue] = expose(useState({ name: 'John' }));
 
-  // Custom key
+  // Custom readable key
   const [n, setN] = expose(useState(0), 'debug:counter');
 
   return (
@@ -87,7 +94,9 @@ Wraps a `useState` pair and registers it under `window.exposed`.
 **Params**
 
 * `useStateReturn` — the tuple from `useState<T>()`.
-* `uniqueName?` — optional key (string). If omitted, a key derived from `useId()` is used.
+* `key?` — optional key (string). If omitted, a unique id for the component instance is used (via React's `useId()`).
+  - By default, you do not need to specify a key; the hook will generate one for you.
+  - If you want to identify the state by a custom readable key (e.g. for easier debugging or sharing between components), provide it as the second argument.
 
 **window\.exposed.get(key)** returns an object:
 
