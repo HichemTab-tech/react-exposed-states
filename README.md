@@ -1,4 +1,4 @@
-# react-exposed-states
+# React Exposed States
 
 A lightweight utility that lets you expose React state values to the browser window. Perfect for debugging and quick runtime tweaks during development.
 
@@ -6,151 +6,128 @@ A lightweight utility that lets you expose React state values to the browser win
 
 ## 🚀 Getting Started
 
-Start by installing the package via your preferred package manager:
+A tiny utility that mirrors a component’s state to `window.exposed` with a stable key,
+so you can inspect, modify, and subscribe to changes from the browser console.
+Designed for **dev-only** workflows.
+
+## 🚀 Install
 
 ```sh
 npm install react-exposed-states
 ```
 
-or, if using pnpm:
+or
 
 ```sh
 pnpm add react-exposed-states
 ```
 
----
+## ☕ 60-Second TL;DR
+
+```tsx
+import { useState } from 'react';
+import expose from 'react-exposed-states';
+
+export default function Counter() {
+  const [count, setCount] = expose(useState(0), 'myCounter'); // key is 'myCounter'
+  return <button onClick={() => setCount(c => c + 1)}>Count: {count}</button>;
+}
+
+// In the browser console:
+// window.exposed.get('myCounter').state         // -> current value
+// window.exposed.get('myCounter').setState(42)  // -> updates React state
+// window.exposed.get('myCounter').subscribe(v => console.log('changed to', v))
+```
+
+If you omit the second argument, the hook uses React’s `useId()` to generate a stable key per mount.
 
 ## 📖 Usage
 
-Here's how to use the `expose` hook to make your React state accessible from the browser console:
+```tsx
+import { useState } from 'react';
+import expose from 'react-exposed-states';
 
-```javascript
-import React, { useState } from 'react';
-import { expose } from 'react-exposed-states';
+function Example() {
+  // Auto key via useId()
+  const [value, setValue] = expose(useState({ name: 'John' }));
 
-function MyComponent() {
-  const [counter, setCounter] = expose(useState(0), 'myCounter');
-  
+  // Custom key
+  const [n, setN] = expose(useState(0), 'debug:counter');
+
   return (
     <div>
-      <p>Counter: {counter}</p>
-      <button onClick={() => setCounter(counter + 1)}>
-        Increment
-      </button>
+      <p>{value.name}</p>
+      <button onClick={() => setN(n => n + 1)}>inc</button>
     </div>
   );
 }
 ```
 
-After rendering this component, you can access and modify the state from the browser console:
+**Console helpers**
 
-```javascript
-// Check the current state
-console.log(window.exposed.get('myCounter').state); // 0
+```js
+// Read
+window.exposed.get('debug:counter').state
 
-// Update the state programmatically
-window.exposed.get('myCounter').setState(42);
+// Write (value or updater)
+window.exposed.get('debug:counter').setState(10)
+window.exposed.get('debug:counter').setState(prev => prev + 1)
 
-// Subscribe to state changes
-window.exposed.get('myCounter').subscribe((newValue) => {
-  console.log('State changed to:', newValue);
-});
+// Subscribe / unsubscribe
+const off = window.exposed.get('debug:counter').subscribe(v => console.log(v))
+off() // stop listening
 ```
 
----
+## ⚙️ API
 
-## ⚙️ API Reference
+### `expose<T>(useStateReturn, uniqueName?) => [T, Dispatch<SetStateAction<T>>]`
 
-### 🚩 **Hook `expose<T>(useStateReturn, uniqueName?)`**
+Wraps a `useState` pair and registers it under `window.exposed`.
 
-A React hook that wraps a useState return value and exposes the state to `window.exposed` for debugging and runtime manipulation.
+**Params**
 
-**Parameters:**
+* `useStateReturn` — the tuple from `useState<T>()`.
+* `uniqueName?` — optional key (string). If omitted, a key derived from `useId()` is used.
 
-| Parameter       | Type                                    | Description                                                |
-|-----------------|----------------------------------------|------------------------------------------------------------|
-| `useStateReturn` | `[T, Dispatch<SetStateAction<T>>]`     | The return value from React's useState hook               |
-| `uniqueName`    | `string` (optional)                    | A unique name for the exposed state. If not provided, uses React's useId() |
+**window\.exposed.get(key)** returns an object:
 
-**Returns:**
+* `state: T` — latest value
+* `setState(next: T | (prev: T) => T)` — updates React state (and this mirror)
+* `subscribe(cb: (v: T) => void): () => void` — listen to changes, returns an unsubscribe
+* `unsubscribe(cb: Function)` — remove a previously added callback
 
-- Type: `[T, Dispatch<SetStateAction<T>>]`
-Returns the same state and setState function as useState, but with enhanced setState that updates both React state and the exposed state.
+**Lifecycle**
 
-**Exposed State Object:**
+* The entry is created on mount and removed on unmount.
+* All registered subscribers for a key are cleared on unmount.
 
-The exposed state object available at `window.exposed.get(uniqueName)` contains:
+## ⚠️ Notes & Limitations
 
-- `state`: The current state value
-- `setState(value)`: Function to update the state
-- `subscribe(callback)`: Function to listen to state changes
-- `unsubscribe(callback)`: Function to stop listening to state changes
+* **Dev-only:** exposing state globally can leak sensitive data. Avoid using in production builds.
+* **Key collisions:** choose descriptive keys (e.g. `feature:cart`) to avoid accidental overlap.
+* **SSR/Node:** the hook accesses `window`; ensure tests run in a `jsdom` environment.
 
-**Example:**
+## ❓ FAQ
 
-```javascript
-import React, { useState } from 'react';
-import { expose } from 'react-exposed-states';
+**Is this a state management library?**
+No—it’s a tiny dev-tool wrapper around `useState` for inspection and ad-hoc mutation.
 
-function App() {
-  // Basic usage with auto-generated name
-  const [count, setCount] = expose(useState(0));
-  
-  // Usage with custom name
-  const [user, setUser] = expose(useState({ name: 'John' }), 'currentUser');
-  
-  return (
-    <div>
-      <p>Count: {count}</p>
-      <p>User: {user.name}</p>
-      <button onClick={() => setCount(count + 1)}>Increment</button>
-    </div>
-  );
-}
+**Can I expose multiple states?**
+Yes—call `expose` for each `useState` with different keys.
 
-// Access from browser console:
-// window.exposed.get('currentUser').state.name // "John"
-// window.exposed.get('currentUser').setState({ name: 'Jane' })
-```
-
----
-
-## 🤝 Contributions
-
-Contributions are welcome! Feel free to:
-
-1. Fork the repository
-2. Create your Feature Branch (`git checkout -b feature/AmazingFeature`)
-3. Commit your Changes (`git commit -m 'Add some AmazingFeature'`)
-4. Push to the Branch (`git push origin feature/AmazingFeature`)
-5. Open a Pull Request
-
-Please follow existing coding styles and clearly state your changes in the pull request.
-
----
+**What happens if I call `setState` only via `window.exposed`?**
+React re-renders as usual; subscribers (if any) are notified.
 
 ## 🐞 Issues
 
-If you encounter any issue, please open an issue [here](https://github.com/HichemTab-tech/react-exposed-states/issues).
+Found a bug or have an idea? Open an issue:
 
----
+* [https://github.com/HichemTab-tech/react-exposed-states/issues](https://github.com/HichemTab-tech/react-exposed-states/issues)
 
-## 📄 License
+## Author
 
-Distributed under the MIT License. See [`LICENSE`](LICENSE) file for more details.
+* [@HichemTab-tech](https://github.com/HichemTab-tech)
 
-&copy; 2025 [Hichem Taboukouyout](mailto:hichem.taboukouyout@hichemtab-tech.me)
+## License
 
----
-
-## ⭐️ Support
-
-If you found this package helpful, consider leaving a star! ⭐️
-
----
-
-## 📣 Acknowledgments
-
-Acknowledgments and thanks to:
-
-- Mention any useful inspiration, references, or external resources here if applicable.
+[MIT](LICENSE)
