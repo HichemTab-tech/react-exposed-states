@@ -28,7 +28,6 @@ const expose = <T>(useStateReturn: [T, Dispatch<SetStateAction<T>>], uniqueName?
     const [state, setState] = useStateReturn;
 
     const id = React.useId();
-    console.log("id", id);
 
     const key = uniqueName || id;
 
