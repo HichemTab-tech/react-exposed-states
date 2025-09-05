@@ -1,15 +1,15 @@
 import * as React from 'react';
-//import {GiveHichemTabTechCredit, MyComponent} from '../dist/main.js'; // Import your built library
-import {GiveHichemTabTechCredit, MyComponent} from 'react-exposed-states'; // Import your dev library
+import {expose} from 'react-exposed-states';
+import {useState} from "react";
 
 const App = () => {
 
-    GiveHichemTabTechCredit();
+    const [counter, setCounter] = expose(useState(0));
 
     return (
         <div>
             <h1 className="text-red-600">react-exposed-states Demo</h1>
-            <MyComponent/>
+            <button onClick={() => setCounter(counter + 1)}>Increment Counter ({counter})</button>
         </div>
     );
 };

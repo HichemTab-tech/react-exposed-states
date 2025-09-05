@@ -2,13 +2,12 @@
   "name": "react-exposed-states",
   "version": "0.1.0",
   "type": "module",
-  "description": "",
+  "description": "A lightweight utility that lets you expose React state values to the browser window. Perfect for debugging and quick runtime tweaks during development.",
   "keywords": [
     "react",
-    "surveyjs",
-    "survey-js",
-    "survey",
-    "creator",
+    "react-states",
+    "expose-states",
+    "state-management",
     "react-package",
     "react-library"
   ],
@@ -23,10 +22,6 @@
     "dev:demo": "vite --config demo/vite.config.demo.ts",
     "build:demo": "vite build --config demo/vite.config.demo.ts"
   },
-  "peerDependencies": {
-    "react": "^18.3.1",
-    "react-dom": "^18.3.1"
-  },
   "author": "Hichem Taboukouyout <hichem.taboukouyout@hichemtab-tech.me>",
   "repository": {
     "type": "git",
@@ -38,6 +33,8 @@
   },
   "homepage": "https://github.com/HichemTab-tech/react-exposed-states#readme",
   "devDependencies": {
+    "react": "^19.1.1",
+    "react-dom": "^19.1.1",
     "@tailwindcss/vite": "^4.1.13",
     "@types/node": "^24.3.1",
     "@types/react": "^19.1.12",
