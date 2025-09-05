@@ -40,9 +40,9 @@ export default function Counter() {
 }
 
 // In the browser console:
-// window.exposed.get('myCounter').state         // -> current value
-// window.exposed.get('myCounter').setState(42)  // -> updates React state
-// window.exposed.get('myCounter').subscribe(v => console.log('changed to', v))
+// window.exposed.get('<r0>').state         // -> current value (check window.exposed to see the keys)
+// window.exposed.get('<r0>').setState(42)  // -> updates React state
+// window.exposed.get('<r0>').subscribe(v => console.log('changed to', v))
 ```
 
 If you omit the second argument, the hook uses React’s `useId()` to generate a stable key per mount.
