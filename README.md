@@ -1,6 +1,6 @@
 # react-exposed-states
 
-A brief and clear description of your package. Explain what problem it solves and why users might find it useful.
+A lightweight utility that lets you expose React state values to the browser window. Perfect for debugging and quick runtime tweaks during development.
 
 ---
 
@@ -22,40 +22,95 @@ pnpm add react-exposed-states
 
 ## 📖 Usage
 
-Show a straightforward example of how to quickly use the package:
+Here's how to use the `expose` hook to make your React state accessible from the browser console:
 
 ```javascript
-import { exampleFunction } from 'react-exposed-states';
+import React, { useState } from 'react';
+import { expose } from 'react-exposed-states';
 
-exampleFunction();
+function MyComponent() {
+  const [counter, setCounter] = expose(useState(0), 'myCounter');
+  
+  return (
+    <div>
+      <p>Counter: {counter}</p>
+      <button onClick={() => setCounter(counter + 1)}>
+        Increment
+      </button>
+    </div>
+  );
+}
+```
+
+After rendering this component, you can access and modify the state from the browser console:
+
+```javascript
+// Check the current state
+console.log(window.exposed.get('myCounter').state); // 0
+
+// Update the state programmatically
+window.exposed.get('myCounter').setState(42);
+
+// Subscribe to state changes
+window.exposed.get('myCounter').subscribe((newValue) => {
+  console.log('State changed to:', newValue);
+});
 ```
 
 ---
 
 ## ⚙️ API Reference
 
-### 🚩 **Function `exampleFunction(args)`**
+### 🚩 **Hook `expose<T>(useStateReturn, uniqueName?)`**
 
-Description of what this function/method does and how to use it.
+A React hook that wraps a useState return value and exposes the state to `window.exposed` for debugging and runtime manipulation.
 
 **Parameters:**
 
-| Parameter   | Type   | Description                        |
-|-------------|--------|------------------------------------|
-| `args`      | any    | Description of the arguments.      |
+| Parameter       | Type                                    | Description                                                |
+|-----------------|----------------------------------------|------------------------------------------------------------|
+| `useStateReturn` | `[T, Dispatch<SetStateAction<T>>]`     | The return value from React's useState hook               |
+| `uniqueName`    | `string` (optional)                    | A unique name for the exposed state. If not provided, uses React's useId() |
 
 **Returns:**
 
-- Type: `any`
-Briefly describe the returned value or output.
+- Type: `[T, Dispatch<SetStateAction<T>>]`
+Returns the same state and setState function as useState, but with enhanced setState that updates both React state and the exposed state.
+
+**Exposed State Object:**
+
+The exposed state object available at `window.exposed.get(uniqueName)` contains:
+
+- `state`: The current state value
+- `setState(value)`: Function to update the state
+- `subscribe(callback)`: Function to listen to state changes
+- `unsubscribe(callback)`: Function to stop listening to state changes
 
 **Example:**
 
 ```javascript
-import { exampleFunction } from 'react-exposed-states';
+import React, { useState } from 'react';
+import { expose } from 'react-exposed-states';
 
-const result = exampleFunction('Hello, world!');
-console.log(result);
+function App() {
+  // Basic usage with auto-generated name
+  const [count, setCount] = expose(useState(0));
+  
+  // Usage with custom name
+  const [user, setUser] = expose(useState({ name: 'John' }), 'currentUser');
+  
+  return (
+    <div>
+      <p>Count: {count}</p>
+      <p>User: {user.name}</p>
+      <button onClick={() => setCount(count + 1)}>Increment</button>
+    </div>
+  );
+}
+
+// Access from browser console:
+// window.exposed.get('currentUser').state.name // "John"
+// window.exposed.get('currentUser').setState({ name: 'Jane' })
 ```
 
 ---

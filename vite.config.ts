@@ -1,3 +1,4 @@
+/// <reference types="vitest" />
 import { defineConfig } from 'vite';
 import banner from 'vite-plugin-banner';
 import react from '@vitejs/plugin-react';
@@ -17,6 +18,9 @@ const bannerContent = `/*!
    `;
 
 export default defineConfig({
+    test: {
+        environment: "jsdom",
+    },
     build: {
         lib: {
             entry: resolve(__dirname, 'src/index.ts'), // Library entry point
@@ -31,11 +35,6 @@ export default defineConfig({
                     react: 'React',
                     'react-dom': 'ReactDOM'
                 }
-            }
-        },
-        terserOptions: {
-            format: {
-                comments: false
             }
         }
     },

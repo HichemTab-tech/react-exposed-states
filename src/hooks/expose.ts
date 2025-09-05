@@ -1,4 +1,4 @@
-import {type Dispatch, type SetStateAction, useEffect, useId} from "react";
+import React, {type Dispatch, type SetStateAction, useEffect} from "react";
 
 const listeners = new Map<string, Set<Function>>();
 
@@ -17,23 +17,32 @@ declare global {
         exposed: typeof exposedStates
     }
 }
-window.exposed = exposedStates;
+if (typeof window !== 'undefined') {
+    window.exposed = exposedStates;
+}
+else{
+    console.warn('window is undefined');
+}
 
 const expose = <T>(useStateReturn: [T, Dispatch<SetStateAction<T>>], uniqueName?: string): [T, Dispatch<SetStateAction<T>>] => {
     const [state, setState] = useStateReturn;
 
-    const id = useId();
+    const id = React.useId();
+    console.log("id", id);
 
     const key = uniqueName || id;
 
     useEffect(() => {
+        if (exposedStates.get(key)) {
+            exposedStates.get(key)!.state = state;
+            listeners.get(key)?.forEach(l => l(state));
+        }
+    }, [state]);
+
+    useEffect(() => {
         exposedStates.set(key, {
             state,
-            setState: ((v) => {
-                setState(v);
-                exposedStates.get(key)!.state = v;
-                listeners.get(key)?.forEach(l => l(v));
-            }) as typeof setState,
+            setState,
             subscribe: (callback: Function) => {
 
                 if (!listeners.has(key)) {
@@ -58,11 +67,7 @@ const expose = <T>(useStateReturn: [T, Dispatch<SetStateAction<T>>], uniqueName?
 
     return [
         state,
-        ((v) => {
-            setState(v);
-            exposedStates.get(key)!.state = v;
-            listeners.get(key)?.forEach(l => l(v));
-        }) as typeof setState
+        setState
     ]
 }
 
