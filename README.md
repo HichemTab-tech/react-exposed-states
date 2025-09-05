@@ -1,7 +1,8 @@
 # React Exposed States
 
-A lightweight utility that lets you expose React state values to the browser window. Perfect for debugging and quick runtime tweaks during development.
+**_A lightweight utility that lets you expose React state values to the browser window. Perfect for debugging and quick runtime tweaks during development._**
 
+![react-exposed-states banner](assets/banner.png)
 ---
 
 ## 🚀 Getting Started
@@ -139,4 +140,4 @@ Found a bug or have an idea? Open an issue:
 
 ## License
 
-[MIT](https://github.com/HichemTab-tech/react-shared-states/blob/master/LICENSE)
+[MIT](https://github.com/HichemTab-tech/react-exposed-states/blob/master/LICENSE)
