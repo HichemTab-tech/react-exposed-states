@@ -24,7 +24,7 @@ export default defineConfig({
     build: {
         lib: {
             entry: resolve(__dirname, 'src/index.ts'), // Library entry point
-            name: 'PASCALCASE-NAME',
+            name: 'reactExposedStates',
             fileName: (format: string) => `main${format === 'es' ? '' : '.min'}.js`,
             formats: ['es', 'umd']
         },
