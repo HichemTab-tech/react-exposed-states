@@ -139,4 +139,4 @@ Found a bug or have an idea? Open an issue:
 
 ## License
 
-[MIT](LICENSE)
+[MIT](https://github.com/HichemTab-tech/react-shared-states/blob/master/LICENSE)
