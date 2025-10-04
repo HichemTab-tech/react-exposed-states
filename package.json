@@ -1,6 +1,6 @@
 {
   "name": "react-exposed-states",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "type": "module",
   "description": "A lightweight utility that lets you expose React state values to the browser window. Perfect for debugging and quick runtime tweaks during development.",
   "keywords": [
@@ -11,7 +11,7 @@
     "react-package",
     "react-library"
   ],
-  "main": "dist/main.js",
+  "main": "dist/main.min.js",
   "module": "dist/main.esm.js",
   "types": "dist/index.d.ts",
   "exports": {
